@@ -1,0 +1,6 @@
+{
+  "1.3.0": {
+    "en": "Realistic latency and jitter: measured on a warm connection without connection set-up and Cloudflare processing time. Quality alerts no longer fire twice after a restart.",
+    "sk": "Realistická latencia a jitter: meria sa na otvorenom spojení bez času nadväzovania spojenia a spracovania na serveri Cloudflare. Upozornenia na kvalitu sa po reštarte už nespúšťajú dvakrát."
+  }
+}

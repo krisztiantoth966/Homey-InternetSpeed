@@ -1,8 +1,11 @@
 {
   "name": "com.tothk.internetspeed",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Internet speed monitor for Homey Pro using Cloudflare speed test endpoints.",
   "main": "app.js",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {},
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  }
 }

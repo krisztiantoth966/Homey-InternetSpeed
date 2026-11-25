@@ -1,11 +1,7 @@
 'use strict';
 
 const Homey = require('homey');
-const https = require('https');
-const { Readable } = require('stream');
-const { performance } = require('perf_hooks');
-
-const HOST = 'speed.cloudflare.com';
+const { CloudflareSpeedTest } = require('../../lib/cloudflare');
 
 class SpeedtestDevice extends Homey.Device {
   async onInit() {
@@ -13,7 +9,8 @@ class SpeedtestDevice extends Homey.Device {
     this._timer = null;
     this._startupTimer = null;
     this._running = false;
-    this._wasDegraded = false;
+    // remembered across restarts so degraded/restored Flows do not fire twice
+    this._wasDegraded = Boolean(this.getStoreValue('wasDegraded'));
 
     this._scheduleNext();
 
@@ -24,8 +21,18 @@ class SpeedtestDevice extends Homey.Device {
   }
 
   async onDeleted() {
+    this._clearTimers();
+  }
+
+  async onUninit() {
+    this._clearTimers();
+  }
+
+  _clearTimers() {
     if (this._timer) this.homey.clearInterval(this._timer);
     if (this._startupTimer) this.homey.clearTimeout(this._startupTimer);
+    this._timer = null;
+    this._startupTimer = null;
   }
 
   async onSettings({ newSettings, changedKeys }) {
@@ -58,26 +65,15 @@ class SpeedtestDevice extends Homey.Device {
     this._running = true;
     this.log(`Starting Cloudflare speed test (${source})`);
 
+    const test = new CloudflareSpeedTest({ userAgent: `Homey-Internet-Speed/${this.homey.manifest.version}` });
     try {
-      const latency = await this._measureLatency(8);
-
-      // Warm-up / estimation pass.
-      const warmDownload = await this._downloadBytes(2 * 1024 * 1024, 15000);
-      const estimatedDownBps = warmDownload.bitsPerSecond;
-      const downloadTarget = this._clamp(Math.round(estimatedDownBps * 4 / 8), 10 * 1024 * 1024, 100 * 1024 * 1024);
-      const download = await this._parallelDownload(downloadTarget, 4);
-
-      const warmUpload = await this._uploadBytes(512 * 1024, 15000);
-      const estimatedUpBps = warmUpload.bitsPerSecond;
-      const uploadTarget = this._clamp(Math.round(estimatedUpBps * 3 / 8), 2 * 1024 * 1024, 30 * 1024 * 1024);
-      const upload = await this._parallelUpload(uploadTarget, 2);
-
+      const result = await test.run();
       const values = {
-        download: this._round1(download / 1e6),
-        upload: this._round1(upload / 1e6),
-        ping: this._round1(latency.ping),
-        jitter: this._round1(latency.jitter),
-        packet_loss: this._round1(latency.loss)
+        download: result.download,
+        upload: result.upload,
+        ping: result.ping,
+        jitter: result.jitter,
+        packet_loss: result.packet_loss,
       };
 
       await Promise.all([
@@ -85,17 +81,18 @@ class SpeedtestDevice extends Homey.Device {
         this.setCapabilityValue('measure_upload_speed', values.upload),
         this.setCapabilityValue('measure_ping', values.ping),
         this.setCapabilityValue('measure_jitter', values.jitter),
-        this.setCapabilityValue('measure_packet_loss', values.packet_loss)
+        this.setCapabilityValue('measure_packet_loss', values.packet_loss),
       ]);
+      if (!this.getAvailable()) await this.setAvailable();
 
       await this.driver.triggerCard('speedtest_completed', this, values, {});
-
       await this._evaluateQuality(values);
 
-      this.log(`Speed test completed: ${values.download} Mbps down, ${values.upload} Mbps up, ${values.ping} ms latency, ${values.jitter} ms jitter`);
+      this.log(`Speed test completed: ${values.download} Mbps down, ${values.upload} Mbps up, `
+        + `${values.ping} ms latency, ${values.jitter} ms jitter, ${Math.round(result.bytes_used / 1e6)} MB used`);
       return values;
     } catch (err) {
-      this.error(`Speed test failed (${source}):`, err);
+      this.error(`Speed test failed (${source}):`, err.message || err);
       try {
         await this.driver.triggerCard('speedtest_failed', this, { error: err.message || String(err) }, {});
       } catch (triggerErr) {
@@ -103,10 +100,10 @@ class SpeedtestDevice extends Homey.Device {
       }
       throw err;
     } finally {
+      test.close();
       this._running = false;
     }
   }
-
 
   async _evaluateQuality(values) {
     const minDownload = Number(this.getSetting('min_download') || 0);
@@ -126,153 +123,10 @@ class SpeedtestDevice extends Homey.Device {
     } else if (!degraded && this._wasDegraded) {
       await this.driver.triggerCard('connection_restored', this, values, {});
     }
+    if (degraded !== this._wasDegraded) await this.setStoreValue('wasDegraded', degraded);
     this._wasDegraded = degraded;
   }
 
-  async _measureLatency(attempts) {
-    const samples = [];
-    let failures = 0;
-
-    for (let i = 0; i < attempts; i++) {
-      try {
-        const t0 = performance.now();
-        await this._request({ method: 'GET', path: `/__down?bytes=1000&r=${Date.now()}-${i}` }, null, 8000, true);
-        samples.push(performance.now() - t0);
-      } catch (err) {
-        failures++;
-        this.log(`Latency probe ${i + 1} failed: ${err.message}`);
-      }
-      await new Promise(resolve => this.homey.setTimeout(resolve, 120));
-    }
-
-    if (!samples.length) throw new Error('Cloudflare latency test failed: no successful requests');
-
-    const sorted = [...samples].sort((a, b) => a - b);
-    const mid = Math.floor(sorted.length / 2);
-    const ping = sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
-
-    let jitter = 0;
-    if (samples.length > 1) {
-      let total = 0;
-      for (let i = 1; i < samples.length; i++) total += Math.abs(samples[i] - samples[i - 1]);
-      jitter = total / (samples.length - 1);
-    }
-
-    return { ping, jitter, loss: (failures / attempts) * 100 };
-  }
-
-  async _parallelDownload(totalBytes, concurrency) {
-    const perRequest = Math.max(1024 * 1024, Math.ceil(totalBytes / concurrency));
-    const start = performance.now();
-    const results = await Promise.all(Array.from({ length: concurrency }, (_, i) =>
-      this._downloadBytes(perRequest, 30000, i)
-    ));
-    const elapsedSeconds = Math.max((performance.now() - start) / 1000, 0.001);
-    const bytes = results.reduce((sum, r) => sum + r.bytes, 0);
-    return bytes * 8 / elapsedSeconds;
-  }
-
-  async _downloadBytes(bytes, timeoutMs, lane = 0) {
-    const start = performance.now();
-    const result = await this._request({
-      method: 'GET',
-      path: `/__down?bytes=${bytes}&r=${Date.now()}-${lane}`
-    }, null, timeoutMs, false);
-    const elapsedSeconds = Math.max((performance.now() - start) / 1000, 0.001);
-    return { bytes: result.bytes, bitsPerSecond: result.bytes * 8 / elapsedSeconds };
-  }
-
-  async _parallelUpload(totalBytes, concurrency) {
-    const perRequest = Math.max(512 * 1024, Math.ceil(totalBytes / concurrency));
-    const start = performance.now();
-    const results = await Promise.all(Array.from({ length: concurrency }, () =>
-      this._uploadBytes(perRequest, 30000)
-    ));
-    const elapsedSeconds = Math.max((performance.now() - start) / 1000, 0.001);
-    const bytes = results.reduce((sum, r) => sum + r.bytes, 0);
-    return bytes * 8 / elapsedSeconds;
-  }
-
-  async _uploadBytes(bytes, timeoutMs) {
-    const start = performance.now();
-    await this._request({
-      method: 'POST',
-      path: '/__up',
-      headers: {
-        'content-type': 'application/octet-stream',
-        'content-length': String(bytes)
-      }
-    }, bytes, timeoutMs, true);
-    const elapsedSeconds = Math.max((performance.now() - start) / 1000, 0.001);
-    return { bytes, bitsPerSecond: bytes * 8 / elapsedSeconds };
-  }
-
-  _request(options, uploadBytes, timeoutMs, discardBody) {
-    return new Promise((resolve, reject) => {
-      let settled = false;
-      let received = 0;
-
-      const finish = (err, value) => {
-        if (settled) return;
-        settled = true;
-        if (err) reject(err); else resolve(value);
-      };
-
-      const req = https.request({
-        host: HOST,
-        port: 443,
-        ...options,
-        headers: {
-          'user-agent': 'Homey-Internet-Speed/1.2.1',
-          'cache-control': 'no-cache',
-          ...(options.headers || {})
-        }
-      }, res => {
-        if (res.statusCode < 200 || res.statusCode >= 300) {
-          res.resume();
-          return finish(new Error(`Cloudflare returned HTTP ${res.statusCode}`));
-        }
-
-        res.on('data', chunk => {
-          received += chunk.length;
-          if (discardBody) return;
-        });
-        res.on('end', () => finish(null, { bytes: received }));
-        res.on('error', err => finish(err));
-      });
-
-      req.setTimeout(timeoutMs, () => req.destroy(new Error(`Request timed out after ${timeoutMs} ms`)));
-      req.on('error', err => finish(err));
-
-      if (typeof uploadBytes === 'number' && uploadBytes > 0) {
-        const chunkSize = 64 * 1024;
-        let remaining = uploadBytes;
-        const stream = new Readable({
-          read() {
-            while (remaining > 0) {
-              const size = Math.min(chunkSize, remaining);
-              remaining -= size;
-              if (!this.push(Buffer.alloc(size))) return;
-            }
-            this.push(null);
-          }
-        });
-        stream.on('error', err => req.destroy(err));
-        stream.pipe(req);
-      } else {
-        req.end();
-      }
-    });
-  }
-
-  _round1(value) {
-    const n = Number(value);
-    return Number.isFinite(n) ? Math.round(n * 10) / 10 : 0;
-  }
-
-  _clamp(value, min, max) {
-    return Math.min(max, Math.max(min, value));
-  }
 }
 
 module.exports = SpeedtestDevice;
