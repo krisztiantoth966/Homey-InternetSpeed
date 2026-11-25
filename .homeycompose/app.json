@@ -1,0 +1,46 @@
+{
+  "id": "com.tothk.internetspeed",
+  "version": "1.2.1",
+  "compatibility": ">=12.0.0",
+  "runtime": "nodejs",
+  "platforms": [
+    "local"
+  ],
+  "sdk": 3,
+  "brandColor": "#2563EB",
+  "name": {
+    "en": "Internet Speed",
+    "sk": "Rýchlosť internetu"
+  },
+  "description": {
+    "en": "Measure internet download, upload, latency, jitter and request loss directly from Homey Pro.",
+    "sk": "Merajte download, upload, latenciu, jitter a stratu požiadaviek priamo z Homey Pro."
+  },
+  "category": "internet",
+  "tags": {
+    "en": [
+      "internet",
+      "speed test",
+      "network",
+      "download",
+      "upload",
+      "latency"
+    ],
+    "sk": [
+      "internet",
+      "test rýchlosti",
+      "sieť",
+      "download",
+      "upload",
+      "latencia"
+    ]
+  },
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Krisztian Toth"
+  }
+}

@@ -1,0 +1,516 @@
+{
+  "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
+  "id": "com.tothk.internetspeed",
+  "version": "1.2.1",
+  "compatibility": ">=12.0.0",
+  "runtime": "nodejs",
+  "platforms": [
+    "local"
+  ],
+  "sdk": 3,
+  "brandColor": "#2563EB",
+  "name": {
+    "en": "Internet Speed",
+    "sk": "Rýchlosť internetu"
+  },
+  "description": {
+    "en": "Measure internet download, upload, latency, jitter and request loss directly from Homey Pro.",
+    "sk": "Merajte download, upload, latenciu, jitter a stratu požiadaviek priamo z Homey Pro."
+  },
+  "category": "internet",
+  "tags": {
+    "en": [
+      "internet",
+      "speed test",
+      "network",
+      "download",
+      "upload",
+      "latency"
+    ],
+    "sk": [
+      "internet",
+      "test rýchlosti",
+      "sieť",
+      "download",
+      "upload",
+      "latencia"
+    ]
+  },
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Krisztian Toth"
+  },
+  "flow": {
+    "triggers": [
+      {
+        "id": "speedtest_completed",
+        "title": {
+          "en": "A speed test completed",
+          "sk": "Test rýchlosti bol dokončený"
+        },
+        "tokens": [
+          {
+            "name": "download",
+            "type": "number",
+            "title": {
+              "en": "Download",
+              "sk": "Download"
+            }
+          },
+          {
+            "name": "upload",
+            "type": "number",
+            "title": {
+              "en": "Upload",
+              "sk": "Upload"
+            }
+          },
+          {
+            "name": "ping",
+            "type": "number",
+            "title": {
+              "en": "Latency",
+              "sk": "Latencia"
+            }
+          },
+          {
+            "name": "jitter",
+            "type": "number",
+            "title": {
+              "en": "Jitter",
+              "sk": "Jitter"
+            }
+          },
+          {
+            "name": "packet_loss",
+            "type": "number",
+            "title": {
+              "en": "Request loss",
+              "sk": "Strata požiadaviek"
+            }
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=speedtest"
+          }
+        ]
+      },
+      {
+        "id": "connection_degraded",
+        "title": {
+          "en": "Internet quality degraded",
+          "sk": "Kvalita internetu sa zhoršila"
+        },
+        "tokens": [
+          {
+            "name": "reason",
+            "type": "string",
+            "title": {
+              "en": "Reason",
+              "sk": "Dôvod"
+            }
+          },
+          {
+            "name": "download",
+            "type": "number",
+            "title": {
+              "en": "Download",
+              "sk": "Download"
+            }
+          },
+          {
+            "name": "upload",
+            "type": "number",
+            "title": {
+              "en": "Upload",
+              "sk": "Upload"
+            }
+          },
+          {
+            "name": "ping",
+            "type": "number",
+            "title": {
+              "en": "Latency",
+              "sk": "Latencia"
+            }
+          },
+          {
+            "name": "jitter",
+            "type": "number",
+            "title": {
+              "en": "Jitter",
+              "sk": "Jitter"
+            }
+          },
+          {
+            "name": "packet_loss",
+            "type": "number",
+            "title": {
+              "en": "Request loss",
+              "sk": "Strata požiadaviek"
+            }
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=speedtest"
+          }
+        ]
+      },
+      {
+        "id": "connection_restored",
+        "title": {
+          "en": "Internet quality restored",
+          "sk": "Kvalita internetu sa obnovila"
+        },
+        "tokens": [
+          {
+            "name": "download",
+            "type": "number",
+            "title": {
+              "en": "Download",
+              "sk": "Download"
+            }
+          },
+          {
+            "name": "upload",
+            "type": "number",
+            "title": {
+              "en": "Upload",
+              "sk": "Upload"
+            }
+          },
+          {
+            "name": "ping",
+            "type": "number",
+            "title": {
+              "en": "Latency",
+              "sk": "Latencia"
+            }
+          },
+          {
+            "name": "jitter",
+            "type": "number",
+            "title": {
+              "en": "Jitter",
+              "sk": "Jitter"
+            }
+          },
+          {
+            "name": "packet_loss",
+            "type": "number",
+            "title": {
+              "en": "Request loss",
+              "sk": "Strata požiadaviek"
+            }
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=speedtest"
+          }
+        ]
+      },
+      {
+        "id": "speedtest_failed",
+        "title": {
+          "en": "A speed test failed",
+          "sk": "Test rýchlosti zlyhal"
+        },
+        "tokens": [
+          {
+            "name": "error",
+            "type": "string",
+            "title": {
+              "en": "Error",
+              "sk": "Chyba"
+            }
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=speedtest"
+          }
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "id": "run_speedtest",
+        "title": {
+          "en": "Run a speed test",
+          "sk": "Spustiť test rýchlosti"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=speedtest"
+          }
+        ]
+      }
+    ]
+  },
+  "drivers": [
+    {
+      "name": {
+        "en": "Internet Speed",
+        "sk": "Rýchlosť internetu"
+      },
+      "class": "sensor",
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "cloud"
+      ],
+      "capabilities": [
+        "measure_download_speed",
+        "measure_upload_speed",
+        "measure_ping",
+        "measure_jitter",
+        "measure_packet_loss"
+      ],
+      "settings": [
+        {
+          "id": "interval_hours",
+          "type": "number",
+          "label": {
+            "en": "Automatic test interval",
+            "sk": "Interval automatického testu"
+          },
+          "hint": {
+            "en": "Hours between automatic speed tests. Set 0 to disable.",
+            "sk": "Počet hodín medzi automatickými testami. Hodnota 0 automatické testovanie vypne."
+          },
+          "value": 6,
+          "attr": {
+            "min": 0,
+            "max": 168,
+            "step": 1
+          },
+          "units": {
+            "en": "hours",
+            "sk": "hodín"
+          }
+        },
+        {
+          "id": "min_download",
+          "type": "number",
+          "label": {
+            "en": "Minimum download",
+            "sk": "Minimálny download"
+          },
+          "hint": {
+            "en": "A degraded-connection Flow is triggered below this value. Set 0 to ignore.",
+            "sk": "Pod touto hodnotou sa spustí Flow pre zhoršené pripojenie. Hodnota 0 kontrolu vypne."
+          },
+          "value": 50,
+          "attr": {
+            "min": 0,
+            "max": 10000,
+            "step": 1
+          },
+          "units": {
+            "en": "Mbps",
+            "sk": "Mbps"
+          }
+        },
+        {
+          "id": "min_upload",
+          "type": "number",
+          "label": {
+            "en": "Minimum upload",
+            "sk": "Minimálny upload"
+          },
+          "hint": {
+            "en": "A degraded-connection Flow is triggered below this value. Set 0 to ignore.",
+            "sk": "Pod touto hodnotou sa spustí Flow pre zhoršené pripojenie. Hodnota 0 kontrolu vypne."
+          },
+          "value": 10,
+          "attr": {
+            "min": 0,
+            "max": 10000,
+            "step": 1
+          },
+          "units": {
+            "en": "Mbps",
+            "sk": "Mbps"
+          }
+        },
+        {
+          "id": "max_latency",
+          "type": "number",
+          "label": {
+            "en": "Maximum latency",
+            "sk": "Maximálna latencia"
+          },
+          "hint": {
+            "en": "A degraded-connection Flow is triggered above this value. Set 0 to ignore.",
+            "sk": "Nad touto hodnotou sa spustí Flow pre zhoršené pripojenie. Hodnota 0 kontrolu vypne."
+          },
+          "value": 100,
+          "attr": {
+            "min": 0,
+            "max": 5000,
+            "step": 1
+          },
+          "units": {
+            "en": "ms",
+            "sk": "ms"
+          }
+        },
+        {
+          "id": "max_request_loss",
+          "type": "number",
+          "label": {
+            "en": "Maximum request loss",
+            "sk": "Maximálna strata požiadaviek"
+          },
+          "hint": {
+            "en": "A degraded-connection Flow is triggered above this value. Set 0 to ignore.",
+            "sk": "Nad touto hodnotou sa spustí Flow pre zhoršené pripojenie. Hodnota 0 kontrolu vypne."
+          },
+          "value": 5,
+          "attr": {
+            "min": 0,
+            "max": 100,
+            "step": 1
+          },
+          "units": {
+            "en": "%",
+            "sk": "%"
+          }
+        }
+      ],
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "options": {
+            "singular": true
+          },
+          "navigation": {
+            "next": "add_devices"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "images": {
+        "small": "/drivers/speedtest/assets/images/small.png",
+        "large": "/drivers/speedtest/assets/images/large.png",
+        "xlarge": "/drivers/speedtest/assets/images/xlarge.png"
+      },
+      "id": "speedtest"
+    }
+  ],
+  "capabilities": {
+    "measure_download_speed": {
+      "type": "number",
+      "title": {
+        "en": "Download",
+        "sk": "Download"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/measure_download_speed.svg",
+      "units": {
+        "en": "Mbps",
+        "sk": "Mbps"
+      },
+      "decimals": 1,
+      "min": 0
+    },
+    "measure_jitter": {
+      "type": "number",
+      "title": {
+        "en": "Jitter",
+        "sk": "Jitter"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/measure_jitter.svg",
+      "units": {
+        "en": "ms",
+        "sk": "ms"
+      },
+      "decimals": 1,
+      "min": 0
+    },
+    "measure_packet_loss": {
+      "type": "number",
+      "title": {
+        "en": "Request loss",
+        "sk": "Strata požiadaviek"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/measure_packet_loss.svg",
+      "units": {
+        "en": "%",
+        "sk": "%"
+      },
+      "decimals": 1,
+      "min": 0,
+      "max": 100
+    },
+    "measure_ping": {
+      "type": "number",
+      "title": {
+        "en": "Latency",
+        "sk": "Latencia"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/measure_ping.svg",
+      "units": {
+        "en": "ms",
+        "sk": "ms"
+      },
+      "decimals": 1,
+      "min": 0
+    },
+    "measure_upload_speed": {
+      "type": "number",
+      "title": {
+        "en": "Upload",
+        "sk": "Upload"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/measure_upload_speed.svg",
+      "units": {
+        "en": "Mbps",
+        "sk": "Mbps"
+      },
+      "decimals": 1,
+      "min": 0
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "triggers": [
+    {
+      "id": "speedtest_completed",
+      "title": { "en": "A speed test completed", "sk": "Test rýchlosti bol dokončený" },
+      "tokens": [
+        { "name": "download", "type": "number", "title": { "en": "Download", "sk": "Download" } },
+        { "name": "upload", "type": "number", "title": { "en": "Upload", "sk": "Upload" } },
+        { "name": "ping", "type": "number", "title": { "en": "Latency", "sk": "Latencia" } },
+        { "name": "jitter", "type": "number", "title": { "en": "Jitter", "sk": "Jitter" } },
+        { "name": "packet_loss", "type": "number", "title": { "en": "Request loss", "sk": "Strata požiadaviek" } }
+      ]
+    },
+    {
+      "id": "connection_degraded",
+      "title": { "en": "Internet quality degraded", "sk": "Kvalita internetu sa zhoršila" },
+      "tokens": [
+        { "name": "reason", "type": "string", "title": { "en": "Reason", "sk": "Dôvod" } },
+        { "name": "download", "type": "number", "title": { "en": "Download", "sk": "Download" } },
+        { "name": "upload", "type": "number", "title": { "en": "Upload", "sk": "Upload" } },
+        { "name": "ping", "type": "number", "title": { "en": "Latency", "sk": "Latencia" } },
+        { "name": "jitter", "type": "number", "title": { "en": "Jitter", "sk": "Jitter" } },
+        { "name": "packet_loss", "type": "number", "title": { "en": "Request loss", "sk": "Strata požiadaviek" } }
+      ]
+    },
+    {
+      "id": "connection_restored",
+      "title": { "en": "Internet quality restored", "sk": "Kvalita internetu sa obnovila" },
+      "tokens": [
+        { "name": "download", "type": "number", "title": { "en": "Download", "sk": "Download" } },
+        { "name": "upload", "type": "number", "title": { "en": "Upload", "sk": "Upload" } },
+        { "name": "ping", "type": "number", "title": { "en": "Latency", "sk": "Latencia" } },
+        { "name": "jitter", "type": "number", "title": { "en": "Jitter", "sk": "Jitter" } },
+        { "name": "packet_loss", "type": "number", "title": { "en": "Request loss", "sk": "Strata požiadaviek" } }
+      ]
+    },
+    {
+      "id": "speedtest_failed",
+      "title": { "en": "A speed test failed", "sk": "Test rýchlosti zlyhal" },
+      "tokens": [
+        { "name": "error", "type": "string", "title": { "en": "Error", "sk": "Chyba" } }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "id": "run_speedtest",
+      "title": { "en": "Run a speed test", "sk": "Spustiť test rýchlosti" }
+    }
+  ]
+}

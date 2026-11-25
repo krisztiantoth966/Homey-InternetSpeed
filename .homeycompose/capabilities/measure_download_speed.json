@@ -1,0 +1,18 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Download",
+    "sk": "Download"
+  },
+  "getable": true,
+  "setable": false,
+  "insights": true,
+  "uiComponent": "sensor",
+  "icon": "/assets/measure_download_speed.svg",
+  "units": {
+    "en": "Mbps",
+    "sk": "Mbps"
+  },
+  "decimals": 1,
+  "min": 0
+}

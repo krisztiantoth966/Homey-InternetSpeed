@@ -1,0 +1,77 @@
+{
+  "name": {
+    "en": "Internet Speed",
+    "sk": "Rýchlosť internetu"
+  },
+  "class": "sensor",
+  "platforms": ["local"],
+  "connectivity": ["cloud"],
+  "capabilities": [
+    "measure_download_speed",
+    "measure_upload_speed",
+    "measure_ping",
+    "measure_jitter",
+    "measure_packet_loss"
+  ],
+  "settings": [
+    {
+      "id": "interval_hours",
+      "type": "number",
+      "label": { "en": "Automatic test interval", "sk": "Interval automatického testu" },
+      "hint": { "en": "Hours between automatic speed tests. Set 0 to disable.", "sk": "Počet hodín medzi automatickými testami. Hodnota 0 automatické testovanie vypne." },
+      "value": 6,
+      "attr": { "min": 0, "max": 168, "step": 1 },
+      "units": { "en": "hours", "sk": "hodín" }
+    },
+    {
+      "id": "min_download",
+      "type": "number",
+      "label": { "en": "Minimum download", "sk": "Minimálny download" },
+      "hint": { "en": "A degraded-connection Flow is triggered below this value. Set 0 to ignore.", "sk": "Pod touto hodnotou sa spustí Flow pre zhoršené pripojenie. Hodnota 0 kontrolu vypne." },
+      "value": 50,
+      "attr": { "min": 0, "max": 10000, "step": 1 },
+      "units": { "en": "Mbps", "sk": "Mbps" }
+    },
+    {
+      "id": "min_upload",
+      "type": "number",
+      "label": { "en": "Minimum upload", "sk": "Minimálny upload" },
+      "hint": { "en": "A degraded-connection Flow is triggered below this value. Set 0 to ignore.", "sk": "Pod touto hodnotou sa spustí Flow pre zhoršené pripojenie. Hodnota 0 kontrolu vypne." },
+      "value": 10,
+      "attr": { "min": 0, "max": 10000, "step": 1 },
+      "units": { "en": "Mbps", "sk": "Mbps" }
+    },
+    {
+      "id": "max_latency",
+      "type": "number",
+      "label": { "en": "Maximum latency", "sk": "Maximálna latencia" },
+      "hint": { "en": "A degraded-connection Flow is triggered above this value. Set 0 to ignore.", "sk": "Nad touto hodnotou sa spustí Flow pre zhoršené pripojenie. Hodnota 0 kontrolu vypne." },
+      "value": 100,
+      "attr": { "min": 0, "max": 5000, "step": 1 },
+      "units": { "en": "ms", "sk": "ms" }
+    },
+    {
+      "id": "max_request_loss",
+      "type": "number",
+      "label": { "en": "Maximum request loss", "sk": "Maximálna strata požiadaviek" },
+      "hint": { "en": "A degraded-connection Flow is triggered above this value. Set 0 to ignore.", "sk": "Nad touto hodnotou sa spustí Flow pre zhoršené pripojenie. Hodnota 0 kontrolu vypne." },
+      "value": 5,
+      "attr": { "min": 0, "max": 100, "step": 1 },
+      "units": { "en": "%", "sk": "%" }
+    }
+  ],
+  "pair": [
+    {
+      "id": "list_devices",
+      "template": "list_devices",
+      "options": { "singular": true },
+      "navigation": { "next": "add_devices" }
+    },
+    { "id": "add_devices", "template": "add_devices" }
+  ],
+  "images": {
+    "small": "/drivers/speedtest/assets/images/small.png",
+    "large": "/drivers/speedtest/assets/images/large.png",
+    "xlarge": "/drivers/speedtest/assets/images/xlarge.png"
+  }
+}

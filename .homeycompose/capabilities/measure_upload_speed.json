@@ -1,0 +1,18 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Upload",
+    "sk": "Upload"
+  },
+  "getable": true,
+  "setable": false,
+  "insights": true,
+  "uiComponent": "sensor",
+  "icon": "/assets/measure_upload_speed.svg",
+  "units": {
+    "en": "Mbps",
+    "sk": "Mbps"
+  },
+  "decimals": 1,
+  "min": 0
+}

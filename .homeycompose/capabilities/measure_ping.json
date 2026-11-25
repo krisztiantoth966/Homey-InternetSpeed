@@ -1,0 +1,18 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Latency",
+    "sk": "Latencia"
+  },
+  "getable": true,
+  "setable": false,
+  "insights": true,
+  "uiComponent": "sensor",
+  "icon": "/assets/measure_ping.svg",
+  "units": {
+    "en": "ms",
+    "sk": "ms"
+  },
+  "decimals": 1,
+  "min": 0
+}

@@ -1,0 +1,19 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Request loss",
+    "sk": "Strata požiadaviek"
+  },
+  "getable": true,
+  "setable": false,
+  "insights": true,
+  "uiComponent": "sensor",
+  "icon": "/assets/measure_packet_loss.svg",
+  "units": {
+    "en": "%",
+    "sk": "%"
+  },
+  "decimals": 1,
+  "min": 0,
+  "max": 100
+}
